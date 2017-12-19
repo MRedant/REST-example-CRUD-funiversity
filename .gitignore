@@ -24,3 +24,5 @@
 # folders #
 target/
 out/
+build/
+.gradle/
