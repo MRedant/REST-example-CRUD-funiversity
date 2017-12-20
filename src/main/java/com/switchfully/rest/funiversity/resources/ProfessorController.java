@@ -2,10 +2,10 @@ package com.switchfully.rest.funiversity.resources;
 
 import com.switchfully.rest.funiversity.domain.Professor;
 import com.switchfully.rest.funiversity.service.ProfessorService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.inject.Inject;
 import java.util.List;
 
 @RestController
@@ -14,7 +14,7 @@ public class ProfessorController {
 
     private ProfessorService professorService;
 
-    @Autowired
+    @Inject
     public ProfessorController(ProfessorService professorService) {
         this.professorService = professorService;
     }
