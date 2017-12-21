@@ -26,7 +26,7 @@ public class ProfessorController {
         this.professorMapper = professorMapper;
     }
 
-    @GetMapping(produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE})
+    @GetMapping(produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public List<ProfessorDto> getProfessor() {
         return professorService.getProfessors().stream()
