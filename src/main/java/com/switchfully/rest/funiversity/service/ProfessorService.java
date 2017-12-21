@@ -2,17 +2,23 @@ package com.switchfully.rest.funiversity.service;
 
 import com.switchfully.rest.funiversity.domain.Professor;
 import com.switchfully.rest.funiversity.domain.ProfessorRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import com.switchfully.rest.funiversity.service.exceptions.IllegalFieldFoundException;
+import com.switchfully.rest.funiversity.service.exceptions.IllegalFieldFoundException.CrudAction;
+import com.switchfully.rest.funiversity.service.exceptions.UnknownResourceException;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.List;
 
-@Service
+import static com.switchfully.rest.funiversity.service.exceptions.IllegalFieldFoundException.CrudAction.CREATE;
+import static com.switchfully.rest.funiversity.service.exceptions.IllegalFieldFoundException.CrudAction.UPDATE;
+
+@Named
 public class ProfessorService {
 
     private final ProfessorRepository professorRepository;
 
-    @Autowired
+    @Inject
     public ProfessorService(ProfessorRepository professorRepository) {
         this.professorRepository = professorRepository;
     }
@@ -22,35 +28,36 @@ public class ProfessorService {
     }
 
     public Professor getProfessor(Integer id) {
-        Professor professor = professorRepository.getProfessor(id);
-        isProfessorPresent(professor);
-        return professor;
+        assertProfessorIsPresent(professorRepository.getProfessor(id));
+        return professorRepository.getProfessor(id);
+    }
+
+    public Professor createProfessor(Professor professor) {
+        assertProfessorIdIsNotPresent(professor, CREATE);
+        return professorRepository.storeProfessor(professor);
     }
 
     public Professor updateProfessor(Integer id, Professor updatedProfessor) {
-        if (updatedProfessor.getId() != null) {
-            throw new IllegalArgumentException("No ID can be present on a Professor object passed to update");
-        }
-        isProfessorPresent(professorRepository.getProfessor(id));
+        assertProfessorIdIsNotPresent(updatedProfessor, UPDATE);
+        assertProfessorIsPresent(professorRepository.getProfessor(id));
         updatedProfessor.setId(id);
         return professorRepository.updateProfessor(updatedProfessor);
     }
 
-    public Professor createProfessor(Professor professor) {
-        if (professor.getId() != null) {
-            throw new IllegalArgumentException("No ID can be present on a Professor object passed for creation");
-        }
-        return professorRepository.storeProfessor(professor);
-    }
-
     public void deleteProfessor(Integer id) {
-        isProfessorPresent(professorRepository.getProfessor(id));
+        assertProfessorIsPresent(professorRepository.getProfessor(id));
         professorRepository.deleteProfessor(id);
     }
 
-    private void isProfessorPresent(Professor professor) {
-        if (professor == null) {
-            throw new IllegalArgumentException("We could not find a professor for the provided ID");
+    private void assertProfessorIsPresent(Professor queriedProfessorById) {
+        if (queriedProfessorById == null) {
+            throw new UnknownResourceException("ID", Professor.class.getSimpleName());
+        }
+    }
+
+    private void assertProfessorIdIsNotPresent(Professor providedProfessor, CrudAction action) {
+        if (providedProfessor.getId() != null) {
+            throw new IllegalFieldFoundException("ID", Professor.class.getSimpleName(), action);
         }
     }
 }

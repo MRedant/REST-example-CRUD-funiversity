@@ -1,10 +1,16 @@
 package com.switchfully.rest.funiversity.domain;
 
-import org.springframework.stereotype.Component;
-
+import javax.inject.Named;
 import java.util.*;
 
-@Component
+/**
+ * This repository contains its own in-memory 'database'
+ * Although this class will be managed by the Spring container
+ * as a stateless bean (@Named), it does contain state (our 'database').
+ * Obviously, this is bad practice. However, for the sake of the exercise,
+ * it's the implementation we go with.
+ */
+@Named
 public class ProfessorRepository {
 
     private static int databaseIndex = 0;
@@ -36,5 +42,14 @@ public class ProfessorRepository {
 
     public void deleteProfessor(Integer idToRemove) {
         professors.remove(idToRemove);
+    }
+
+    /**
+     * A real-world production application with a real database
+     * should never have a method like this!
+     */
+    public void clear() {
+        databaseIndex = 1;
+        professors.clear();
     }
 }

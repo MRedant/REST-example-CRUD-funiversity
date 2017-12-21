@@ -1,31 +1,27 @@
 package com.switchfully.rest.funiversity.resources;
 
+import com.switchfully.rest.funiversity.service.exceptions.IllegalFieldFoundException;
+import com.switchfully.rest.funiversity.service.exceptions.UnknownResourceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ControllerAdvice(basePackages = {"com.switchfully.rest.funiversity"})
 public class ProfessorControllerAdvice {
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Object illegalArgumentException(final IllegalArgumentException exception) {
-        return new ResponseEntity<>(new MyError(exception.getMessage()), HttpStatus.BAD_REQUEST);
+    @ExceptionHandler(UnknownResourceException.class)
+    public ResponseEntity<String> convertUnknownIdException(final UnknownResourceException exception) {
+        return new ResponseEntity<>(
+                exception.getMessage(),
+                HttpStatus.NOT_FOUND);
     }
 
-    private class MyError {
-        private String errorMessage;
-
-        private MyError(String errorMessage) {
-            this.errorMessage = errorMessage;
-        }
-
-        public String getErrorMessage() {
-            return errorMessage;
-        }
+    @ExceptionHandler(IllegalFieldFoundException.class)
+    public ResponseEntity<String> convertIllegalFieldFoundException(final IllegalFieldFoundException exception) {
+        return new ResponseEntity<>(
+                exception.getMessage(),
+                HttpStatus.BAD_REQUEST);
     }
-
 
 }

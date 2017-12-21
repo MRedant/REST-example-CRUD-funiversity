@@ -3,44 +3,56 @@ package com.switchfully.rest.funiversity.resources;
 import com.switchfully.rest.funiversity.domain.Professor;
 import com.switchfully.rest.funiversity.service.ProfessorService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 
 @RestController
 @RequestMapping(path = "/professors")
 public class ProfessorController {
 
     private ProfessorService professorService;
+    private ProfessorMapper professorMapper;
 
     @Inject
-    public ProfessorController(ProfessorService professorService) {
+    public ProfessorController(ProfessorService professorService, ProfessorMapper professorMapper) {
         this.professorService = professorService;
+        this.professorMapper = professorMapper;
     }
 
-    @GetMapping(produces = "application/json")
+    @GetMapping(produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE})
     @ResponseStatus(HttpStatus.OK)
-    public List<Professor> getProfessor() {
-        return professorService.getProfessors();
+    public List<ProfessorDto> getProfessor() {
+        return professorService.getProfessors().stream()
+                .map(professorMapper::toDto)
+                .collect(Collectors.toList());
     }
 
-    @GetMapping(path = "/{id}", produces = "application/json")
+    @GetMapping(path = "/{id}", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public Professor getProfessor(@PathVariable("id") Integer id) {
-        return professorService.getProfessor(id);
+    public ProfessorDto getProfessor(@PathVariable("id") Integer id) {
+        return professorMapper
+                .toDto(professorService.getProfessor(id));
     }
 
-    @PostMapping(consumes = "application/json", produces = "application/json")
+    @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public Professor createProfessor(@RequestBody Professor professor) {
-        return professorService.createProfessor(professor);
+    public ProfessorDto createProfessor(@RequestBody Professor professor) {
+        return professorMapper
+                .toDto(professorService.createProfessor(professor));
     }
 
-    @PutMapping(path = "/{id}", consumes = "application/json")
+    @PutMapping(path = "/{id}", consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public Professor updateProfessor(@PathVariable Integer id, @RequestBody Professor professor) {
-        return professorService.updateProfessor(id, professor);
+    public ProfessorDto updateProfessor(@PathVariable Integer id, @RequestBody Professor professor) {
+        return professorMapper
+                .toDto(professorService.updateProfessor(id, professor));
     }
 
     @DeleteMapping(path = "/{id}")
