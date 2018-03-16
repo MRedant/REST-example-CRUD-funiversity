@@ -1,9 +1,7 @@
 package com.switchfully.rest.funiversity.resources;
 
-import com.switchfully.rest.funiversity.domain.Professor;
 import com.switchfully.rest.funiversity.service.ProfessorService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
@@ -42,16 +40,18 @@ public class ProfessorController {
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public ProfessorDto createProfessor(@RequestBody Professor professor) {
+    public ProfessorDto createProfessor(@RequestBody ProfessorDto professor) {
         return professorMapper
-                .toDto(professorService.createProfessor(professor));
+                .toDto(professorService
+                        .createProfessor(professorMapper.toDomain(professor)));
     }
 
     @PutMapping(path = "/{id}", consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public ProfessorDto updateProfessor(@PathVariable Integer id, @RequestBody Professor professor) {
+    public ProfessorDto updateProfessor(@PathVariable Integer id, @RequestBody ProfessorDto professor) {
         return professorMapper
-                .toDto(professorService.updateProfessor(id, professor));
+                .toDto(professorService
+                        .updateProfessor(id, professorMapper.toDomain(professor)));
     }
 
     @DeleteMapping(path = "/{id}")
