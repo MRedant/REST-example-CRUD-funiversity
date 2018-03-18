@@ -46,7 +46,7 @@ public class ProfessorController {
                         .createProfessor(professorMapper.toDomain(professor)));
     }
 
-    @PutMapping(path = "/{id}", consumes = APPLICATION_JSON_VALUE)
+    @PutMapping(path = "/{id}", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public ProfessorDto updateProfessor(@PathVariable Integer id, @RequestBody ProfessorDto professor) {
         return professorMapper
